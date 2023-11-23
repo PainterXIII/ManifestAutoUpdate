@@ -1,4 +1,5 @@
 from binascii import hexlify
+import logging
 import vdf
 from steam.enums import EResult, EServerType
 from steam.enums.emsg import EMsg
@@ -7,6 +8,7 @@ from steam.utils.proto import proto_fill_from_dict
 
 
 class Apps(object):
+    log = logging.getLogger("steam")
     licenses = None  #: :class:`dict` Accounts' package licenses
 
     def __init__(self, *args, **kwargs):
@@ -205,6 +207,7 @@ class Apps(object):
         :return: `CMsgClientGetAppOwnershipTicketResponse <https://github.com/ValvePython/steam/blob/39627fe883feeed2206016bacd92cf0e4580ead6/protobufs/steammessages_clientserver.proto#L158-L162>`_
         :rtype: proto message
         """
+        self.log.info('Getting app ownership ticket for %s', app_id)
         return self.send_job_and_wait(MsgProto(EMsg.ClientGetAppOwnershipTicket),
                                       {'app_id': app_id},
                                       timeout=10

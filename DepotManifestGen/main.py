@@ -68,7 +68,6 @@ class Result(dict):
 def get_manifest(save_id, cdn, app_id, depot_id, manifest_gid, remove_old=False, save_path=None, retry_num=10):
     if not save_path:
         save_path = Path().absolute()
-    # app_path = save_path / f'depots/{app_id}'
     app_path = save_path / f'depots/{save_id}'
     manifest_path = app_path / f'{depot_id}_{manifest_gid}.manifest'
     if manifest_path.exists():
@@ -126,91 +125,6 @@ def get_manifest(save_id, cdn, app_id, depot_id, manifest_gid, remove_old=False,
         f.write(manifest.serialize(compress=False))
     with open(app_path / 'config.vdf', 'w') as f:
         vdf.dump(d, f, pretty=True)
-    # try:
-    #     # addconfig = {}
-    #     # if os.path.exists(app_path / 'addconfig.vdf'):
-    #     #     print('***************************---addconfig')
-    #     #     adc = vdf.load(open(app_path / 'addconfig.vdf'))
-    #     #     addconfig = adc['depots']
-    #     # for key in addconfig.keys():
-    #     #     d['depots'][key] = addconfig[key]
-    #     # with open(app_path / 'config.vdf', 'w') as f:
-    #     #     vdf.dump(d, f, pretty=True)
-    #
-    #
-    #     dkeys = getDecryptionKey(app_path / 'config.vdf')
-    #     path = 'data/depots/' + str(app_id)
-    #     if os.path.exists(path + '/' + 'iuser' + '.txt'):
-    #         friuser = open(path + '/' + 'iuser' + '.txt', 'r', encoding='utf-8')
-    #         iuser = friuser.readline()
-    #         friuser.close()
-    #     else:
-    #         iuser = ''
-    #
-    #     frticket = open(path + '/' + str(app_id) + '-ticket' + '.txt', 'r', encoding='utf-8')
-    #     ticket = frticket.readlines()
-    #     frticket.close()
-    #     filepathonly = path + '/' + str(app_id) + '-ticket-only.txt'
-    #     fr = open(filepathonly, 'r', encoding='utf-8')
-    #     flag = False
-    #     onlys = fr.readlines()
-    #     fr.close()
-    #
-    #     onlyticket = []
-    #     ot = ''
-    #     flagappid = False
-    #     for line in onlys:
-    #         line = line.strip()
-    #         onlyts = line.split('----')
-    #         if len(onlyts) == 2:
-    #             ot = onlyts[1]
-    #             onlyticket.append(onlyts[1])
-    #             if onlyts[0] == str(app_id):
-    #                 flagappid = True
-    #     if len(set(onlyticket)) == 1:
-    #         flag = True
-    #     filepath = path + '/' + str(app_id) + '.txt'
-    #     fw = open(filepath, 'w+', encoding='utf-8')
-    #     fw.write(iuser + '\n')
-    #     for item in dkeys:
-    #         fw.write(item + '\n')
-    #     for line in ticket:
-    #         fw.write(line.strip() + '\n')
-    #     if flag:
-    #         fw.write(encrypt(str(app_id) + '----' + ot) + '\n')
-    #     if not flagappid and len(onlyticket) > 0:
-    #         fw.write(encrypt(str(app_id) + '----' + onlyticket[0]) + '\n')
-    #
-    #     fw.close()
-    #
-    #     fr = open(filepath, 'r', encoding='utf-8')
-    #     tlines = fr.readlines()
-    #     fr.close()
-    #     tls = []
-    #     fw = open(filepath, 'w+', encoding='utf-8')
-    #     for line in tlines:
-    #         if line not in tls:
-    #             fw.write(line)
-    #             tls.append(line)
-    #     fw.close()
-    #
-    #     upload_aliyun('gKeyConfig/' + str(app_id) + '.txt', filepath)
-    #     files = os.listdir(path)
-    #     fw = open('temp.txt', 'w+', encoding='utf-8')
-    #
-    #     for file in files:
-    #         if file.endswith('fest') or file.endswith('svd'):
-    #             fw.write(file.split('.')[0] + '\n')
-    #             upload_aliyun('depotcache/' + str(app_id) + '/' + file, path + '/' + file)
-    #
-    #     fw.close()
-    #     upload_aliyun('depotcache/' + str(app_id) + '/' + str(app_id) + '.txt', 'temp.txt')
-    #     log.info("--------------上传成功---------------")
-    # except:
-    #     log.error("--------------出错---------------")
-    #     return Result(result=True, code=EResult.OK, app_id=app_id, depot_id=depot_id, manifest_gid=manifest_gid,
-    #                   delete_list=delete_list)
-
     return Result(result=True, code=EResult.OK, app_id=app_id, depot_id=depot_id, manifest_gid=manifest_gid,
                   delete_list=delete_list)
 

@@ -54,7 +54,7 @@ if __name__ == '__main__':
                     for file in files:
                         # 检查文件后缀名是否为 .manifest
                         if file.endswith(".manifest"):
-                            upload_aliyun("depotcache/appid/", os.path.join(root, file))
+                            upload_aliyun(f"depotcache/{end_id}/{file}", f"data/depots/{end_id}/{file}")
                             log.info(f"Done,{file} upload success")
                             fc.write(file.replace(".manifest", "") + "\n")
                 fc.flush()
@@ -65,14 +65,14 @@ if __name__ == '__main__':
                     upload_aliyun(f"depotcache/{end_id}/{end_id}.txt", app_id_cache_path)
                     log.info(f"Done,data uploaded successfully")
                 except Exception as e:
-                    log.error(f"Completed,data upload failed. Error: {str(e)}")
+                    log.error(f"Completed,{app_id}_cache.txt upload failed. Error: {str(e)}")
 
 
 
 
                 # 清理临时文件
-                os.remove(temp_path)
-                os.remove(app_id_cache_path)
+                #os.remove(temp_path)
+                #os.remove(app_id_cache_path)
 
 
     args = parser.parse_args()

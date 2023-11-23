@@ -280,9 +280,6 @@ class ManifestAutoUpdate:
         self.log.info(f"User {username}: {app_id_list}")
 
         for app_id in app_id_list:
-            # self.log.info(f"app_id: {app_id}")
-            # self.log.info(f"update_app_id_list: {self.update_app_id_list}")
-            # self.log.info(f"app_id_list: {app_id_list}")
             if int(app_id) not in self.update_app_id_list:
                 continue
             with lock:
@@ -303,76 +300,11 @@ class ManifestAutoUpdate:
                     new_dlc = [int(i) for i in old_dlc.split(',')]
                     dlc[int(app_id)].extend(new_dlc)
                     self.log.info(f"all_dlc_list: {new_dlc}")
-                    # 将new_dlc添加到app_id_list
-                    # if new_dlc not in app_id_list:
-                    #     app_id_list.clear()
-                    #     app_id_list.extend(new_dlc)
-                    #     self.update_app_id_list.clear()
-                    #     self.update_app_id_list.extend(new_dlc)
                 else:
                     dlc[int(app_id)].append(int(old_dlc))
                     self.log.info(f"old_dlc: {old_dlc}")
-                    # 将old_dlc添加到app_id_list
-                    # if old_dlc not in app_id_list:
-                    #     app_id_list.append(int(old_dlc))
-                    #     self.update_app_id_list.append(int(old_dlc))
-                # if old_dlc:
-                #     if "," in old_dlc:
-                #         new_dlc = [int(i) for i in old_dlc.split(',')]
-                #         dlc[int(app_id)].extend(new_dlc)
-                #         self.log.info(f"new_dlc: {new_dlc}")
-                #     else:
-                #         dlc[int(app_id)].append(int(old_dlc))
-                #         self.log.info(f"old_dlc: {old_dlc}")
             except:
-                print("未找到dlc")
-            # self.log.info(f"fresh_resp: {fresh_resp['apps']}")
-            # self.log.info("----------------------fresh_resp结束----------------------------")
-            # old_dlc = app['extended']["listofdlc"]
-            # if 'common' in app and app['common']['type'].lower() in ['game', 'dlc', 'application']:
-            #     if 'depots' not in fresh_resp['apps'][app_id]:
-            #         continue
-            #     for depot_id, depot in fresh_resp['apps'][app_id]['depots'].items():
-            #         self.log.info(f"depot_id: {depot_id}")
-            #         with lock:
-            #             if depot_id.isdigit():
-            #                 self.app_lock[int(app_id)].add(depot_id)
-            #             # 添加depot_id至对应appid
-            #                 try:
-            #                     result_data[int(app_id)][int(depot_id)] = set()
-            #                 except:
-            #                     self.log.info("depot_id 添加 -> result_data 失败")
-            #         if 'manifests' in depot and 'public' in depot['manifests'] and int(depot_id) in {
-            #             *cdn.licensed_depot_ids, *cdn.licensed_app_ids}:
-            #             try:
-            #                 manifest_gid = depot['manifests']['public']
-            #                 # 如果执行到这里，说明解析成功
-            #                 self.log.info(f"解析成功,开始解析gid：{manifest_gid}")
-            #             except KeyError:
-            #                 # 如果发生 KeyError，说明解析失败
-            #                 manifest_gid = depot['manifests']['public']['gid']
-            #                 self.log.info(f"解析失败,开始解析gid：{manifest_gid}")
-            #             if isinstance(manifest_gid, dict):
-            #                 manifest_gid = manifest_gid.get('gid')
-            #             if not isinstance(manifest_gid, str):
-            #                 continue
-            #             self.set_depot_info(depot_id, manifest_gid)
-            #             # 添加gid至对应depot_id
-            #             if manifest_gid not in result_data[int(app_id)][int(depot_id)]:
-            #                 result_data[int(app_id)][int(depot_id)].add(manifest_gid)
-            #             # ---------
-            #             with lock:
-            #                 if int(app_id) not in self.user_info[username]['app']:
-            #                     self.user_info[username]['app'].append(int(app_id))
-            #                     self.log.info(f"新appid: {app_id}")
-            #             flag = False
-            #             job = gevent.Greenlet(LogExceptions(self.async_task), cdn, app_id, depot_id, manifest_gid)
-            #             job.rawlink(
-            #                 functools.partial(self.get_manifest_callback, username, app_id, depot_id, manifest_gid))
-            #             job_list.append(job)
-            #             gevent.idle()
-            #     for job in job_list:
-            #         job.start()
+                self.log.info("未找到dlc")
             if 'common' in app and app['common']['type'].lower() in ['game', 'dlc', 'application']:
                 if 'depots' not in fresh_resp['apps'][app_id]:
                     continue

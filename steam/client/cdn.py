@@ -554,57 +554,17 @@ class CDNClient(object):
         self.temp_json[app_id] = {}
         try:
             temp_sy = self.steam.get_app_ticket(app_id)
-
-            self.temp_json[app_id]["ticket"] = encrypt(str(depot_id) + '----' + str(temp_sy.ticket.hex()))
-            self.temp_json[app_id]["ticket-only"] = str(depot_id) + '----' + str(temp_sy.ticket.hex())
             try:
-                self.temp_json[app_id]["iuser"] = str(app_id) + '|' + encrypt(str(app_id) + '----' + str(self.temp_json["friend_id"]))
+                self.temp_json[app_id]["ticket"] = encrypt(str(depot_id) + '----' + str(temp_sy.ticket.hex()))
+                log.info(f"{app_id} ->" + str(depot_id) + '----' + str(temp_sy.ticket.hex()))
             except Exception as e:
                 traceback.print_exc()
-
-
-            # path = 'data/depots/' + str(app_id)
-            # if not os.path.exists(path):
-            #     os.makedirs(path)
-            # log.info("-----------------------手动分割-------------------------")
-            # filepath = path + '/' + str(app_id) + '-ticket.txt'
-            # filepathonly = path + '/' + str(app_id) + '-ticket-only.txt'
-            # try:
-            #     fw = open(filepath, 'w', encoding='utf-8')
-            #     fw.write(encrypt(str(depot_id) + '----' + str(temp_sy.ticket.hex())) + '\n')
-            #     #log.info(encrypt(str(depot_id) + '----' + str(temp_sy.ticket.hex())) + '\n')
-            #     # my_dict["key3"] = "value3"  # 添加新的键值对
-            #     self.temp_json[app_id]["ticket"] = encrypt(str(depot_id) + '----' + str(temp_sy.ticket.hex()))
-            #     fw.flush()
-            #     fw.close()
-            # except:
-            #     log.error(f"{app_id} -> temp_sy.ticket.hex() 获取失败")
-            #
-            # try:
-            #     fw = open(filepathonly, 'w', encoding='utf-8')
-            #     fw.write(str(depot_id) + '----' + str(temp_sy.ticket.hex()) + '\n')
-            #     #log.info(str(depot_id) + '----' + str(temp_sy.ticket.hex()) + '\n')
-            #     self.temp_json[app_id]["ticket-only"] = str(depot_id) + '----' + str(temp_sy.ticket.hex())
-            #     fw.flush()
-            #     fw.close()
-            # except:
-            #     log.error(f"{app_id} -> 明文 temp_sy.ticket.hex() 获取失败")
-            #
-            #
-            # print('读取 iuser....')
-            # fr = open('friend_temp.txt', 'r', encoding='utf-8')
-            # lines = fr.readlines()
-            # fr.close()
-            # print("写入 iuser...")
-            # filepath = path + '/' + 'iuser.txt'
-            # fw = open(filepath, 'w+', encoding='utf-8')
-            # for line in lines:
-            #     fw.write(str(app_id) + '|' + encrypt(str(app_id) + '----' + line))
-            #     self.temp_json[app_id]["iuser"] = str(app_id) + '|' + encrypt(str(app_id) + '----' + line)
-            # fw.flush()
-            # fw.close()
             try:
-
+                self.temp_json[app_id]["iuser"] = str(app_id) + '|' + encrypt(str(app_id) + '----' + str(self.temp_json["friend_id"]))
+                log.info(str(app_id) + '|' + str(app_id) + '----' + str(self.temp_json["friend_id"]))
+            except Exception as e:
+                traceback.print_exc()
+            try:
                 log.info(f"{app_id} -> write -> temp.json")
                 # 先创建目录
                 os.makedirs('data/depots/', exist_ok=True)
