@@ -7,8 +7,8 @@ from reptile import parser, ManifestAutoUpdate, result_data, dlc
 from steam.utils.tools import upload_aliyun
 
 log = logging.getLogger('ManifestAutoUpdate')
-if __name__ == '__main__':
-    def end(app_id, dep_gid_data):
+
+def end(app_id):
         end_id = app_id
         temp_path = f"data/depots/temp.json"
         if os.path.exists(temp_path):
@@ -18,7 +18,8 @@ if __name__ == '__main__':
             # 创建app_id.txt并追加数据
             result_path = f"data/depots/{app_id}/{app_id}.txt"
             fw = open(result_path, 'a+', encoding='utf-8')
-            fw.write(f"{json_data[app_id]['iuser']}\n")
+            for _iuser in json_data['iuser']:
+                fw.write(f"{_iuser}\n")
             # 如果data/depots/{app_id}/config.vdf存在,则打开,转为json格式,并追加数据
             """
             这块代码是为了获取config.vdf中的DecryptionKey
@@ -36,12 +37,9 @@ if __name__ == '__main__':
                     decryption_key = match[1]
                     fw.write(f"{app_id}----{decryption_key}\n")
                 # 结尾添加 ticket
-                tickets = {}
-                for app_id, app_data in json_data.items():
-                    if isinstance(app_data, dict) and "ticket" in app_data:
-                        ticket = app_data["ticket"]
-                        tickets[app_id] = ticket
-                        fw.write(f"{tickets[app_id]}\n")
+                # 结尾添加 ticket
+                for ticket in json_data["ticket"]:
+                    fw.write(f"{ticket}\n")
                 log.info(f"END {app_id}.txt 数据写入成功")
                 fw.flush()
                 fw.close()
@@ -67,14 +65,10 @@ if __name__ == '__main__':
                 except Exception as e:
                     log.error(f"Completed,{app_id}_cache.txt upload failed. Error: {str(e)}")
 
-
-
-
                 # 清理临时文件
-                #os.remove(temp_path)
-                #os.remove(app_id_cache_path)
-
-
+                os.remove(temp_path)
+                os.remove(app_id_cache_path)
+if __name__ == '__main__':
     args = parser.parse_args()
     log.info(args)
     ManifestAutoUpdate(args.credential_location, level=args.level, pool_num=args.pool_num, retry_num=args.retry_num,
@@ -132,7 +126,7 @@ if __name__ == '__main__':
     log.info(json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')))
 
     # 爬虫进程结束,开始处理数据
-    end(args.app_id_list[0], data)
+    end(args.app_id_list[0])
 
     # if args.app_id_list != "":
     #     for app_id in args.app_id_list:

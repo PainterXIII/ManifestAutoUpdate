@@ -461,7 +461,10 @@ class CDNClient(object):
     servers = deque()  #: CS Server list
     _chunk_cache = LRUCache(20)
     cell_id = 0  #: Cell ID to use, initialized from SteamClient instance
-    temp_json = {}
+    temp_json = {
+        "ticket": [],
+        "iuser": []
+    }
 
     def __init__(self, client):
         """CDNClient allows loading and reading of manifests for Steam apps are used
@@ -551,17 +554,24 @@ class CDNClient(object):
         :rtype: bytes
         :raises SteamError: error message
         """
-        self.temp_json[app_id] = {}
         try:
             temp_sy = self.steam.get_app_ticket(app_id)
             try:
-                self.temp_json[app_id]["ticket"] = encrypt(str(depot_id) + '----' + str(temp_sy.ticket.hex()))
-                log.info(f"{app_id} ->" + str(depot_id) + '----' + str(temp_sy.ticket.hex()))
+                app_id_ticket = encrypt(str(app_id) + '----' + str(temp_sy.ticket.hex()))
+                if app_id_ticket not in self.temp_json["ticket"]:
+                    self.temp_json["ticket"].append(app_id_ticket)
+                    #log.info(f"{app_id} ->" + app_id_ticket)
+                depot_id_ticket = encrypt(str(depot_id) + '----' + str(temp_sy.ticket.hex()))
+                if depot_id_ticket not in self.temp_json["ticket"]:
+                    self.temp_json["ticket"].append(depot_id_ticket)
+                    #log.info(f"{depot_id} ->" + depot_id_ticket)
             except Exception as e:
-                traceback.print_exc()
+                 traceback.print_exc()
             try:
-                self.temp_json[app_id]["iuser"] = str(app_id) + '|' + encrypt(str(app_id) + '----' + str(self.temp_json["friend_id"]))
-                log.info(str(app_id) + '|' + str(app_id) + '----' + str(self.temp_json["friend_id"]))
+                # self.temp_json[app_id]["iuser"] = str(app_id) + '|' + encrypt(str(app_id) + '----' + str(self.temp_json["friend_id"]))
+                if len(self.temp_json["iuser"]) == 0:
+                    self.temp_json["iuser"].append(str(app_id) + '|' + encrypt(str(app_id) + '----' + str(self.temp_json["friend_id"])))
+                    log.info(str(app_id) + '|' + str(app_id) + '----' + str(self.temp_json["friend_id"]))
             except Exception as e:
                 traceback.print_exc()
             try:
