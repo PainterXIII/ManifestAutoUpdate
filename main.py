@@ -55,6 +55,8 @@ def end(app_id):
                             upload_aliyun(f"depotcache/{end_id}/{file}", f"data/depots/{end_id}/{file}")
                             log.info(f"Done,{file} upload success")
                             fc.write(file.replace(".manifest", "") + "\n")
+                # 继续遍历
+                
                 fc.flush()
                 fc.close()
                 log.info(f"END {app_id}_cache.txt written successfully")
@@ -95,23 +97,6 @@ if __name__ == '__main__':
             "manifest_gid_list": [],
             "show": True
         }
-        # path = 'data/depots' + '/' + str(_app_id)
-        # filepath = path + '/' + str(_app_id) + '-ticket.txt'
-        # app_path = 'data/depots' + '/' + str(_app_id) + '/'
-        #
-        # if os.path.exists(filepath) and os.path.exists(app_path + 'addconfig.vdf'):
-        #     log.info("上次已爬取")
-        # else:
-        #     fw = open(filepath, 'w+', encoding='utf-8')
-        #     fw.close()
-        #     log.info("无")
-        # filepathonly = path + '/' + str(_app_id) + '-ticket-only.txt'
-        # if os.path.exists(filepathonly) and os.path.exists(app_path + 'addconfig.vdf'):
-        #     print('')
-        # else:
-        #     fw = open(filepathonly, 'w+', encoding='utf-8')
-        #     fw.close()
-        #     log.info("无")
 
         for depot_id, gid_set in result_data[_app_id].items():
             for gid in gid_set:
@@ -127,110 +112,3 @@ if __name__ == '__main__':
 
     # 爬虫进程结束,开始处理数据
     end(args.app_id_list[0])
-
-    # if args.app_id_list != "":
-    #     for app_id in args.app_id_list:
-    #         path = 'data/depots' + '/' + str(app_id)
-    #         filepath = path + '/' + str(app_id) + '-ticket.txt'
-    #         app_path = 'data/depots' + '/' + str(app_id) + '/'
-    #         try:
-    #             fw = open(filepath, 'w+', encoding='utf-8')
-    #             fw.close()
-    #             filepathonly = path + '/' + str(app_id) + '-ticket-only.txt'
-    #             fw = open(filepathonly, 'w+', encoding='utf-8')
-    #             fw.close()
-    #         except:
-    #             log.info('error')
-    #
-    #         app_path = 'data/depots' + '/' + str(app_id) + '/'
-    #
-    #         addconfig = {}
-    #         if os.path.exists(app_path + 'config.vdf'):
-    #             d = vdf.load(open(app_path + 'config.vdf'))
-    #         insert_appid(f"data/depots/", str(app_id))
-    #         if os.path.exists(app_path + 'addconfig.vdf'):
-    #             print('***************************---addconfig')
-    #             adc = vdf.load(open(app_path + 'addconfig.vdf'))
-    #             addconfig = adc['depots']
-    #
-    #             for key in addconfig.keys():
-    #                 d['depots'][key] = addconfig[key]
-    #
-    #             with open(app_path + 'config.vdf', 'w') as f:
-    #                 vdf.dump(d, f, pretty=True)
-    #
-    #
-    #         def getDecryptionKey(path):
-    #             fr = open(path, 'r', encoding='utf-8')
-    #             lines = fr.readlines()
-    #             totals = []
-    #             i = 0
-    #             while i < len(lines):
-    #                 if lines[i].count('DecryptionKey') == 0:
-    #                     i = i + 1
-    #                     continue
-    #                 key = lines[i - 2].strip().replace('"', '')
-    #                 value = lines[i].split('"')[-2]
-    #                 totals.append(key + '----' + value)
-    #
-    #                 i = i + 1
-    #             return totals
-    #
-    #
-    #         def jiami(code):
-    #             url = 'http://47.98.52.241:8081/encryption'
-    #             res = requests.post(url, code)
-    #             return res.text
-    #
-    #
-    #         dkeys = getDecryptionKey(app_path + 'config.vdf')
-    #
-    #         # os.remove(path + '/'+str(app_id) + '-ticket'+ '.txt')
-    #         filepath = path + '/' + str(app_id) + '.txt'
-    #         fr = open(filepath, 'r', encoding='utf-8')
-    #         apptxts = fr.readlines()
-    #         fr.close()
-    #         fw = open(filepath, 'w+', encoding='utf-8')
-    #         fw.write(apptxts[0].strip() + '\n')
-    #         for item in dkeys:
-    #             fw.write(item + '\n')
-    #         for item in apptxts[1:]:
-    #             fw.write(item.strip() + '\n')
-    #
-    #         fw.close()
-    #         fr = open(filepath, 'r', encoding='utf-8')
-    #         tlines = fr.readlines()
-    #         fr.close()
-    #         tls = []
-    #         fw = open(filepath, 'w+', encoding='utf-8')
-    #         for line in tlines:
-    #             if line not in tls:
-    #                 fw.write(line)
-    #                 tls.append(line)
-    #         fw.close()
-    #
-    #         def upload_aliyun(dst_file, local_file):
-    #             import oss2
-    #             yourAccessKeyId = 'LTAI5tJG95GpSGr4jXeyu554'
-    #             yourAccessKeySecret = 'pnz5ubi9Au4VSW7Psrfl1hhc0gXisQ'
-    #             auth = oss2.Auth(yourAccessKeyId, yourAccessKeySecret)
-    #             end_point = 'oss-cn-hangzhou.aliyuncs.com'
-    #             bucket_name = 'laksdjflkajs'
-    #             bucket = oss2.Bucket(auth, end_point, bucket_name)
-    #             bucket.put_object_from_file(dst_file, local_file)
-    #             return True
-    #
-    #
-    #         upload_aliyun('gKeyConfig/' + str(app_id) + '.txt', filepath)
-    #
-    #         files = os.listdir(path)
-    #         fw = open('temp.txt', 'w+', encoding='utf-8')
-    #
-    #         for file in files:
-    #             if file.endswith('fest') or file.endswith('svd'):
-    #                 fw.write(file.split('.')[0] + '\n')
-    #                 upload_aliyun('depotcache/' + str(app_id) + '/' + file, path + '/' + file)
-    #
-    #         fw.close()
-    #         upload_aliyun('depotcache/' + str(app_id) + '/' + str(app_id) + '.txt', 'temp.txt')
-    #         print('final      上传成功！')
