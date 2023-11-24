@@ -462,6 +462,7 @@ class CDNClient(object):
     _chunk_cache = LRUCache(20)
     cell_id = 0  #: Cell ID to use, initialized from SteamClient instance
     temp_json = {
+        "client_supplied_steamid":[],
         "friend_id": [], 
         "ticket": [],
         "iuser": []

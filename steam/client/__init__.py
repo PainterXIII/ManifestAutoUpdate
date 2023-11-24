@@ -33,6 +33,7 @@ from steam.exceptions import SteamError
 from steam.client.builtins import BuiltinBase
 from steam.utils import ip4_from_int, ip4_to_int
 from steam.utils.proto import proto_fill_from_dict
+from steam.client.cdn import CDNClient
 
 if six.PY2:
     _cli_input = raw_input
@@ -567,8 +568,10 @@ class SteamClient(CMClient, BuiltinBase):
         resp = self.wait_msg(EMsg.ClientLogOnResponse, timeout=30)
 
         if resp and resp.body.eresult == EResult.OK:
+            if len(CDNClient.temp_json["client_supplied_steamid"]) == 0:
+                self.log.info(f"client_supplied_steamid: {resp.body.client_supplied_steamid}")
+                CDNClient.temp_json["client_supplied_steamid"].append(resp.body.client_supplied_steamid)
             self.sleep(0.5)
-
         return EResult(resp.body.eresult) if resp else EResult.Fail
 
     def anonymous_login(self):

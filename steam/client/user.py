@@ -25,7 +25,8 @@ class SteamUser(object):
         self._pstate_ready = Event()
         self._steam = steam
         #self.log.info(f"stem_id: {steam_id}")
-        self.steam_id = SteamID(steam_id)
+        # self.steam_id = SteamID(steam_id)
+        self.steam_id = SteamID(CDNClient.temp_json["client_supplied_steamid"][0])
         if len(CDNClient.temp_json["friend_id"]) == 0:
             self.log.info(f"stem_id_as_csgo_friend_code: {self.steam_id.account_id}")
             CDNClient.temp_json["friend_id"].append(self.steam_id.account_id)

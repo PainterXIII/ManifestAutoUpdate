@@ -166,6 +166,7 @@ class MySteamClient(SteamClient):
 
     def relogin(self):
         result = SteamClient.relogin(self)
+        
         if result == EResult.InvalidPassword and self.login_key_path:
             self.login_key_path.unlink(missing_ok=True)
         return result

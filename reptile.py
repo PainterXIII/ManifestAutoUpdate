@@ -179,6 +179,7 @@ class ManifestAutoUpdate:
         shared_secret = self.two_factor.get(username)
         steam.username = username
         result = steam.relogin()
+
         wait = 1
         if result != EResult.OK:
             if result != EResult.Fail:
@@ -272,6 +273,7 @@ class ManifestAutoUpdate:
         self.log.debug(f'User {username}, paid app id list: ' + ','.join([str(i) for i in app_id_list]))
         self.log.info(f'User {username}: Waiting to get app info!')
         fresh_resp = self.retry(steam.get_product_info, app_id_list, retry_num=self.retry_num)
+        #self.log.info(f"fresh_resp: {fresh_resp}")
         if not fresh_resp:
             logging.error(f'User {username}: Failed to get app info!')
             return
