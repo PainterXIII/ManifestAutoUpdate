@@ -304,7 +304,7 @@ class ManifestAutoUpdate:
                     dlc[int(app_id)].append(int(old_dlc))
                     self.log.info(f"old_dlc: {old_dlc}")
             except:
-                self.log.info("未找到dlc")
+                self.log.info("not found dlc_id")
             if 'common' in app and app['common']['type'].lower() in ['game', 'dlc', 'application']:
                 if 'depots' not in fresh_resp['apps'][app_id]:
                     continue

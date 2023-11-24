@@ -462,6 +462,7 @@ class CDNClient(object):
     _chunk_cache = LRUCache(20)
     cell_id = 0  #: Cell ID to use, initialized from SteamClient instance
     temp_json = {
+        "friend_id": [], 
         "ticket": [],
         "iuser": []
     }
@@ -570,8 +571,8 @@ class CDNClient(object):
             try:
                 # self.temp_json[app_id]["iuser"] = str(app_id) + '|' + encrypt(str(app_id) + '----' + str(self.temp_json["friend_id"]))
                 if len(self.temp_json["iuser"]) == 0:
-                    self.temp_json["iuser"].append(str(app_id) + '|' + encrypt(str(app_id) + '----' + str(self.temp_json["friend_id"])))
-                    log.info(str(app_id) + '|' + str(app_id) + '----' + str(self.temp_json["friend_id"]))
+                    self.temp_json["iuser"].append(str(app_id) + '|' + encrypt(str(app_id) + '----' + str(self.temp_json["friend_id"][0])))
+                    log.info(str(app_id) + '|' + str(app_id) + '----' + str(self.temp_json["friend_id"][0]))
             except Exception as e:
                 traceback.print_exc()
             try:

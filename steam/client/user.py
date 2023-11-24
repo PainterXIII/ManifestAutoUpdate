@@ -24,12 +24,12 @@ class SteamUser(object):
     def __init__(self, steam_id, steam):
         self._pstate_ready = Event()
         self._steam = steam
-        #print('user.py 25  stem_id:',steam_id)
-        self.log.info(f"New stem_id: {steam_id}")
+        #self.log.info(f"stem_id: {steam_id}")
         self.steam_id = SteamID(steam_id)
         #print('stem_id_as_csgo_friend_code:', self.steam_id.account_id)
-        self.log.info(f"Nestem_id_as_csgo_friend_code: {self.steam_id.account_id}")
-        CDNClient.temp_json["friend_id"] = self.steam_id.account_id
+        if len(CDNClient.temp_json["friend_id"]) == 0:
+            self.log.info(f"stem_id_as_csgo_friend_code: {self.steam_id.account_id}")
+            CDNClient.temp_json["friend_id"].append(self.steam_id.account_id)
         # fw = open('friend_temp.txt', 'w+', encoding='utf-8')
         #
         # fw.write(str(self.steam_id.account_id))

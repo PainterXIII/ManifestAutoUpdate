@@ -40,7 +40,7 @@ def end(app_id):
                 # 结尾添加 ticket
                 for ticket in json_data["ticket"]:
                     fw.write(f"{ticket}\n")
-                log.info(f"END {app_id}.txt 数据写入成功")
+                log.info(f"END {app_id}.txt written successfully")
                 fw.flush()
                 fw.close()
                 # 开始将data 字典中的 dlc 和 manifest_gid_list 写入到app_id_cache.txt中
@@ -57,7 +57,7 @@ def end(app_id):
                             fc.write(file.replace(".manifest", "") + "\n")
                 fc.flush()
                 fc.close()
-                log.info(f"END {app_id}_cache.txt 数据写入成功")
+                log.info(f"END {app_id}_cache.txt written successfully")
                 try:
                     upload_aliyun(f"gKeyConfig/{end_id}.txt", result_path)
                     upload_aliyun(f"depotcache/{end_id}/{end_id}.txt", app_id_cache_path)
