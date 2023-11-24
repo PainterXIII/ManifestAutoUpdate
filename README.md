@@ -22,20 +22,6 @@
         * `-u, --update`: 通过获取仓库所有app信息,来判断爬取的账号
         * `-a, --app-id`: 限定爬取的appid,可指定多个,空格分隔
         * `-U, --users`: 限定爬取的账号,可指定多个,空格分隔
-    * `storage.py`: 使用清单一键入库
-        * `-r, --repo`: 指定仓库
-        * `-a, --app-id`: 游戏id
-        * `-p, --app-path`: 导入本仓库app分支格式的目录
-    * `apps.py`: 导出仓库所有游戏信息到`apps.xlsx`
-        * `-r, --repo`: 指定仓库
-        * `-o, --output`: 保存目录
-    * `merge.py`: 用于`Actions`自动合并`pr`
-        * `-t, --token`: 个人访问令牌
-        * `-l, --level`: 日志等级,默认为`INFO`
-    * `push.py`: 用于推送分支
-    * `pr.py`: 用于pr分支
-        * `-r, --repo`: 指定仓库
-        * `-t, --token`: 个人访问令牌
 * `data`分支: 用于存放账号数据,第一次运行程序初始化后会自动将其签出到`data`目录
     * `data/client`: 用于存放账号凭证文件和`cm`服务器信息的目录,需要将账号`ssfn`文件放在该目录
     * `data/users.json`: 用于存放账号和密码
@@ -48,8 +34,6 @@
             * `update`: 上次更新时间戳
             * `enable`: 是否被禁用
             * `status`: 登录失败的原因 - [EResult](https://partner.steamgames.com/doc/api/steam_api#EResult)
-    * `data/.gitattributes`: 记录`git-crypt`需要加密的文件
-        * 默认加密: `users.json client/*.key 2fa.json`
     * `data/2fa.json`: 记录账号`2fa`信息
         * 格式: `{"账号": "shared_secret", ...}`
 * 以`appid`为名称的分支: 该分支用于存放清单和密钥文件
@@ -128,18 +112,6 @@
             * `repo`: 仓库地址
         * `MERGE`: 自动检查`pr`并合并清单
         * `UPDATE`: 加了`-u`参数
-
-## 如何pr清单
-
-* 本项目使用`Actions`定期检查并合并清单，是否合并成功请在`Actions`运行完后查看对应分支
-
-1. 完成部署本项目并爬取清单
-2. 打开你要`pr`清单的分支，点击`Compare & pull request`
-3. 点击`Create pull request`创建`pr`
-
-## Telegram交流群
-
-* [SteamManifestShare](https://t.me/SteamManifestShare)
 
 ## 仓库游戏查看
 
