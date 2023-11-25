@@ -1,1 +1,16 @@
-{"wt6do7iu4ff1": {"app": [1868140], "update": 0, "enable": true}, "adtkb56623": {"app": [648800], "update": 0, "enable": true}}
+{
+  "wt6do7iu4ff1": {
+    "app": [
+      1868140
+    ],
+    "update": 0,
+    "enable": true
+  },
+  "adtkb56623": {
+    "app": [
+      648800
+    ],
+    "update": 0,
+    "enable": true
+  }
+}
