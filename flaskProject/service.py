@@ -94,9 +94,9 @@ app_id_list = []
 # 解析 JSON 输入并执行命令
 def execute_shell_command(shell_json):
     # 解析 JSON 字符串
-    shell = json.loads(shell_json)
-    username = shell["username"]
-    app_id = shell["app_id"]
+    # shell = json.loads(shell_json)
+    username = shell_json["username"]
+    app_id = shell_json["app_id"]
 
     # 检测是否有进程在运行
     if app_id in app_id_list:
@@ -113,7 +113,7 @@ def execute_shell_command(shell_json):
     # 启动新线程执行命令
     def run_command():
         try:
-            command = f'python main.py -u -a {app_id} -U {username}'
+            command = f'python ../main.py -u -a {app_id} -U {username}'
             process = subprocess.Popen(command, shell=True)  # use shell=True to handle command as string
             log.info(f'Executing command: {command}')
             process.wait()  # 等待命令执行完成

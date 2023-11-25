@@ -60,7 +60,7 @@ def replace_all_user():
 
 # 执行shell命令,参数为json,协议POST
 @app.route('/execute_shell', methods=['POST'])
-def execute_shell_command():
+def execute_shell():
     # 获取post参数中的json_data
     json_data = request.get_json()
     # 调用service.py中的replace_all_user_info方法
