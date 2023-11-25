@@ -113,7 +113,7 @@ def execute_shell_command(shell_json):
     # 启动新线程执行命令
     def run_command():
         try:
-            command = f'python main.py -u -a {app_id} -U {username}'
+            command = f'python3 main.py -u -a {app_id} -U {username}'
             process = subprocess.Popen(command, shell=True)  # use shell=True to handle command as string
             log.info(f'Executing command: {command}')
             process.wait()  # 等待命令执行完成
