@@ -74,6 +74,26 @@ def replace_all_user_info(json_data):
     return json.dumps(data, indent=4, separators=(',', ': '), ensure_ascii=False)
 
 
+# 执行shell命令,参数为json,协议POST
+# 执行的命令为: python main.py -u -a 1868140 -U wt6do7iu4ff1
+# 如果,传入的app_id的进程没有结束,则不执行重复的app_id的命令,需要写记录执行
+
+"""
+执行shell命令,参数为json,协议POST
+解析json后执行的命令为: python main.py -u -a app_id -U username
+如果,传入的app_id的进程没有结束,则不执行重复的app_id的命令,需要写记录执行
+进程结束后,从pid中删除app_id
+"""
+pid = {
+    "app_id": [],
+}
+
+shell = {
+    "username": "wt6do7iu4ff1",
+    "app_id": 1868140
+}
+
+
 
 
 if __name__ == '__main__':
