@@ -10,7 +10,7 @@ def get_user():
     # 获取get参数中的username
     username = request.args.get('username')
     # 调用service.py中的get_user_info方法
-    return get_user_info(username)
+    return get_user_info(username), {'Content-Type': 'text/json; charset=utf-8'}
 
 
 """
@@ -28,7 +28,7 @@ def add_user():
     # 获取post参数中的user_info
     user_info = request.get_json()
     # 调用service.py中的add_user_info方法
-    return add_user_info(user_info)
+    return add_user_info(user_info), {'Content-Type': 'text/json; charset=utf-8'}
 
 
 """
@@ -46,7 +46,7 @@ def delete_user():
     # 获取post参数中的username_list
     username_list = request.get_json()
     # 调用service.py中的delete_user_info方法
-    return delete_user_info(username_list)
+    return delete_user_info(username_list), {'Content-Type': 'text/json; charset=utf-8'}
 
 
 # 替换所有用户信息,参数为json,协议POST
@@ -55,7 +55,7 @@ def replace_all_user():
     # 获取post参数中的json_data
     json_data = request.get_json()
     # 调用service.py中的replace_all_user_info方法
-    return replace_all_user_info(json_data)
+    return replace_all_user_info(json_data), {'Content-Type': 'text/json; charset=utf-8'}
 
 
 if __name__ == '__main__':
