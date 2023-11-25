@@ -5,7 +5,7 @@ import time
 import base64
 import gevent
 import logging
-import argparse
+
 import functools
 import traceback
 from pathlib import Path
@@ -17,20 +17,7 @@ from DepotManifestGen.main import MySteamClient, MyCDNClient, get_manifest, Bill
 
 lock = Lock()
 sys.setrecursionlimit(100000)
-parser = argparse.ArgumentParser()
-parser.add_argument('-c', '--credential-location', default=None)
-parser.add_argument('-l', '--level', default='INFO')
-parser.add_argument('-p', '--pool-num', type=int, default=8)
-parser.add_argument('-r', '--retry-num', type=int, default=3)
-parser.add_argument('-t', '--update-wait-time', type=int, default=86400)
-parser.add_argument('-k', '--key', default=None)
-parser.add_argument('-x', '--x', default=None)
-parser.add_argument('-i', '--init-only', action='store_true', default=False)
-parser.add_argument('-C', '--cli', action='store_true', default=False)
-parser.add_argument('-P', '--no-push', action='store_true', default=False)
-parser.add_argument('-u', '--update', action='store_true', default=False)
-parser.add_argument('-a', '--app-id', dest='app_id_list', action='extend', nargs='*')
-parser.add_argument('-U', '--users', dest='user_list', action='extend', nargs='*')
+
 dlc = {}
 result_data = {}
 new_result = {}

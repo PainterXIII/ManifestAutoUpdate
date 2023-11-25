@@ -122,6 +122,11 @@ from steam.utils.tools import encrypt
 
 log = logging.getLogger('ManifestAutoUpdate')
 
+# 定义临时存储app_id
+temp = {
+    "temp_id": []
+}
+
 try:
     import lzma
 except ImportError:
@@ -579,8 +584,8 @@ class CDNClient(object):
             try:
                 log.info(f"{app_id} -> write -> temp.json")
                 # 先创建目录
-                os.makedirs('data/depots/', exist_ok=True)
-                fw = open('data/depots/temp.json', 'w+', encoding='utf-8')
+                os.makedirs(f"data/depots/{temp['temp_id'][0]}", exist_ok=True)
+                fw = open(f"data/depots/{temp['temp_id'][0]}/temp.json", 'w+', encoding='utf-8')
                 fw.write(json.dumps(self.temp_json, indent=4, separators=(',', ': '), ensure_ascii=False))
                 fw.close()
             except Exception as e:

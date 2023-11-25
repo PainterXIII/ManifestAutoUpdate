@@ -2,15 +2,16 @@ import json
 import logging
 import os
 import re
-
-from reptile import parser, ManifestAutoUpdate, result_data, dlc
+import argparse
+from reptile import ManifestAutoUpdate, result_data, dlc
 from steam.utils.tools import upload_aliyun
-
+from steam.client.cdn import temp
+from steam.client.cdn import CDNClient
 log = logging.getLogger('ManifestAutoUpdate')
 
 def end(app_id):
-        end_id = app_id
-        temp_path = f"data/depots/temp.json"
+        #end_id = app_id
+        temp_path = f"data/depots/{app_id}/temp.json"
         if os.path.exists(temp_path):
             fr = open(temp_path, 'r', encoding='utf-8')
             json_data = json.loads(fr.read())
@@ -33,26 +34,26 @@ def end(app_id):
                 matches = re.findall(pattern, fr.read())
 
                 for match in matches:
-                    app_id = match[0]
+                    depot_id = match[0]
                     decryption_key = match[1]
-                    fw.write(f"{app_id}----{decryption_key}\n")
+                    fw.write(f"{depot_id}----{decryption_key}\n")
                 # 结尾添加 ticket
                 # 结尾添加 ticket
                 for ticket in json_data["ticket"]:
                     fw.write(f"{ticket}\n")
-                log.info(f"END {app_id}.txt written successfully")
+                log.info(f"END {depot_id}.txt written successfully")
                 fw.flush()
                 fw.close()
                 # 开始将data 字典中的 dlc 和 manifest_gid_list 写入到app_id_cache.txt中
                 #log.info(f"dep_gid_data: {dep_gid_data}")
-                app_id_cache_path = f"data/depots/{end_id}/{end_id}_cache.txt"
+                app_id_cache_path = f"data/depots/{app_id}/{app_id}_cache.txt"
                 fc = open(app_id_cache_path, 'a+', encoding='utf-8')
                 # 遍历目录下的文件和子目录
-                for root, dirs, files in os.walk(f"data/depots/{end_id}"):
+                for root, dirs, files in os.walk(f"data/depots/{app_id}"):
                     for file in files:
                         # 检查文件后缀名是否为 .manifest
                         if file.endswith(".manifest"):
-                            upload_aliyun(f"depotcache/{end_id}/{file}", f"data/depots/{end_id}/{file}")
+                            upload_aliyun(f"depotcache/{app_id}/{file}", f"data/depots/{app_id}/{file}")
                             log.info(f"Done,{file} upload success")
                             fc.write(file.replace(".manifest", "") + "\n")
                 # 继续遍历
@@ -61,17 +62,32 @@ def end(app_id):
                 fc.close()
                 log.info(f"END {app_id}_cache.txt written successfully")
                 try:
-                    upload_aliyun(f"gKeyConfig/{end_id}.txt", result_path)
-                    upload_aliyun(f"depotcache/{end_id}/{end_id}.txt", app_id_cache_path)
+                    upload_aliyun(f"gKeyConfig/{app_id}.txt", result_path)
+                    upload_aliyun(f"depotcache/{app_id}/{app_id}.txt", app_id_cache_path)
                     log.info(f"Done,data uploaded successfully")
                 except Exception as e:
                     log.error(f"Completed,{app_id}_cache.txt upload failed. Error: {str(e)}")
 
                 # 清理临时文件
-                os.remove(temp_path)
+                #os.remove(temp_path)
                 os.remove(app_id_cache_path)
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c', '--credential-location', default=None)
+    parser.add_argument('-l', '--level', default='INFO')
+    parser.add_argument('-p', '--pool-num', type=int, default=8)
+    parser.add_argument('-r', '--retry-num', type=int, default=3)
+    parser.add_argument('-t', '--update-wait-time', type=int, default=86400)
+    parser.add_argument('-k', '--key', default=None)
+    parser.add_argument('-x', '--x', default=None)
+    parser.add_argument('-i', '--init-only', action='store_true', default=False)
+    parser.add_argument('-C', '--cli', action='store_true', default=False)
+    parser.add_argument('-P', '--no-push', action='store_true', default=False)
+    parser.add_argument('-u', '--update', action='store_true', default=False)
+    parser.add_argument('-a', '--app-id', dest='app_id_list', action='extend', nargs='*')
+    parser.add_argument('-U', '--users', dest='user_list', action='extend', nargs='*')
     args = parser.parse_args()
+    temp["temp_id"].append(args.app_id_list[0]) # 将app_id赋给cdn.py
     log.info(args)
     ManifestAutoUpdate(args.credential_location, level=args.level, pool_num=args.pool_num, retry_num=args.retry_num,
                        update_wait_time=args.update_wait_time, key=args.key, init_only=args.init_only,
