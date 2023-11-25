@@ -58,6 +58,5 @@ def replace_all_user():
     return replace_all_user_info(json_data)
 
 
-
 if __name__ == '__main__':
-    app.run()
+    app.run(host="0.0.0.0", port=5000)
