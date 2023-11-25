@@ -58,5 +58,14 @@ def replace_all_user():
     return replace_all_user_info(json_data), {'Content-Type': 'text/json; charset=utf-8'}
 
 
+# 执行shell命令,参数为json,协议POST
+@app.route('/execute_shell', methods=['POST'])
+def execute_shell_command():
+    # 获取post参数中的json_data
+    json_data = request.get_json()
+    # 调用service.py中的replace_all_user_info方法
+    return execute_shell_command(json_data), {'Content-Type': 'text/json; charset=utf-8'}
+
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)

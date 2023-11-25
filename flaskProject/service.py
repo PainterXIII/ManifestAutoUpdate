@@ -1,6 +1,8 @@
 import json
 import logging
 import os
+import subprocess
+from threading import Thread
 
 log = logging.getLogger('service')
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -74,26 +76,63 @@ def replace_all_user_info(json_data):
     return json.dumps(data, indent=4, separators=(',', ': '), ensure_ascii=False)
 
 
-# 执行shell命令,参数为json,协议POST
-# 执行的命令为: python main.py -u -a 1868140 -U wt6do7iu4ff1
-# 如果,传入的app_id的进程没有结束,则不执行重复的app_id的命令,需要写记录执行
-
 """
-执行shell命令,参数为json,协议POST
+执行shell命令,参数为json
 解析json后执行的命令为: python main.py -u -a app_id -U username
 如果,传入的app_id的进程没有结束,则不执行重复的app_id的命令,需要写记录执行
-进程结束后,从pid中删除app_id
+进程结束后,从app_id_list中删除app_id
 """
-pid = {
-    "app_id": [],
-}
-
-shell = {
+shell_json = {
     "username": "wt6do7iu4ff1",
-    "app_id": 1868140
+    "app_id": "1868140"
 }
 
+# 初始的 app_id_list
+app_id_list = []
 
+
+# 解析 JSON 输入并执行命令
+def execute_shell_command(shell_json):
+    # 解析 JSON 字符串
+    shell = json.loads(shell_json)
+    username = shell["username"]
+    app_id = shell["app_id"]
+
+    # 检测是否有进程在运行
+    if app_id in app_id_list:
+        log.info(f'App ID {app_id} is already running. Command will not be executed.')
+        data = {
+            "code": 201,
+            "msg": "当前app_id的进程正在运行,请等待进程结束后再执行命令"
+        }
+        return json.dumps(data, indent=4, separators=(',', ': '), ensure_ascii=False)
+
+    # 在 app_id_list 中记录当前 app_id
+    app_id_list.append(app_id)
+
+    # 启动新线程执行命令
+    def run_command():
+        try:
+            command = f'python main.py -u -a {app_id} -U {username}'
+            process = subprocess.Popen(command, shell=True)  # use shell=True to handle command as string
+            log.info(f'Executing command: {command}')
+            process.wait()  # 等待命令执行完成
+            log.info(f'Command execution completed.')
+        except Exception as e:
+            print(f'An error occurred: {e}')
+        finally:
+            # 进程结束后应该删除 app_id
+            if app_id in app_id_list:
+                app_id_list.remove(app_id)
+
+    thread = Thread(target=run_command)
+    thread.start()
+
+    data = {
+        "code": 200,
+        "msg": f"{app_id} 进程已启动,Thanks!"
+    }
+    return json.dumps(data, indent=4, separators=(',', ': '), ensure_ascii=False)
 
 
 if __name__ == '__main__':
@@ -109,6 +148,10 @@ if __name__ == '__main__':
         "username1": "password1",
         "username2": "password2"
     }
+
+    # 测试运行
+    # process = execute_shell_command(shell_json=shell_json)
+
     # print(get_user_info('vlcq89982'))
     # print(delete_user_info(username_list))
     # print(add_user_info(user_info))
