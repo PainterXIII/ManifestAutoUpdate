@@ -6,7 +6,7 @@ from threading import Thread
 
 log = logging.getLogger('service')
 dir_path = os.path.dirname(os.path.realpath(__file__))
-user_info_path = os.path.join(dir_path, '../data/users.json')
+user_info_path = os.path.join(dir_path, 'data/users.json')
 
 
 # 查询用户信息,参数为用户名
@@ -113,7 +113,7 @@ def execute_shell_command(shell_json):
     # 启动新线程执行命令
     def run_command():
         try:
-            command = f'python ../main.py -u -a {app_id} -U {username}'
+            command = f'python main.py -u -a {app_id} -U {username}'
             process = subprocess.Popen(command, shell=True)  # use shell=True to handle command as string
             log.info(f'Executing command: {command}')
             process.wait()  # 等待命令执行完成
