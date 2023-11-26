@@ -84,6 +84,7 @@ def get_manifest(save_id, cdn, app_id, depot_id, manifest_gid, remove_old=False,
         except KeyboardInterrupt:
             exit(-1)
         except SteamError as e:
+            #traceback.print_exc() # 打印详细错误
             if retry_num == 0:
                 return Result(result=False, code=e.eresult, app_id=app_id, depot_id=depot_id, manifest_gid=manifest_gid)
             retry_num -= 1
@@ -91,6 +92,9 @@ def get_manifest(save_id, cdn, app_id, depot_id, manifest_gid, remove_old=False,
             if e.eresult == EResult.AccessDenied:
                 return Result(result=False, code=e.eresult, app_id=app_id, depot_id=depot_id, manifest_gid=manifest_gid)
             gevent.idle()
+
+            # 尝试用depot_id + depot_id来获取manifest
+            get_manifest(save_id, cdn, save_id, depot_id, manifest_gid, True, save_path, retry_num)
         except:
             log.error(traceback.format_exc())
             return Result(result=False, code=EResult.Fail, app_id=app_id, depot_id=depot_id, manifest_gid=manifest_gid)
