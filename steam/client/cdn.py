@@ -582,7 +582,7 @@ class CDNClient(object):
             except Exception as e:
                 traceback.print_exc()
         except:
-            log.error("error! ticket-iuser  cdn.py")
+            log.error("error! ticket-iuser")
             if depot_id not in self.depot_keys:
                 msg = self.steam.get_depot_key(app_id, depot_id)
                 if msg and msg.eresult == EResult.OK:
