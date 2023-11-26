@@ -18,7 +18,7 @@ def write_to_file(file_path, content, mode='a+', encoding='utf-8'):
     with open(file_path, mode, encoding=encoding) as fw:
         for line in content:
             # 检查line是否存在，如果不存在再写入
-            if f"{line}\n" not in existing_lines:
+            if f"{line}\n" not in existing_lines or f"{line}" not in existing_lines:
                 fw.write(f"{line}\n")
 
 
