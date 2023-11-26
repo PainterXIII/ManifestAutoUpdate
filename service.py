@@ -105,7 +105,7 @@ def execute_shell_command(shell_json):
         log.info(f'App ID {app_id} is already running. Command will not be executed.')
         data = {
             "code": 201,
-            "msg": "当前app_id的进程正在运行,请等待进程结束后再执行命令"
+            "msg": f"当前{app_id}的进程正在运行,请等待进程结束后再执行命令"
         }
         return json.dumps(data, indent=4, separators=(',', ': '), ensure_ascii=False)
 
@@ -115,7 +115,7 @@ def execute_shell_command(shell_json):
         log.info(f'App ID {app_id} is added to pending list. Waiting for space to run.')
         data = {
             "code": 202,
-            "msg": "系统繁忙,您的进程已加入等待队列"
+            "msg": f"系统繁忙,您的{app_id}进程已加入等待队列"
         }
         return json.dumps(data, indent=4, separators=(',', ': '), ensure_ascii=False)
     else:
@@ -150,7 +150,7 @@ def execute_shell_command(shell_json):
 
     data = {
         "code": 200,
-        "msg": f"{app_id} 进程已启动, Thanks!"
+        "msg": f"{app_id} 进程已启动, Thanks!",
     }
     return json.dumps(data, indent=4, separators=(',', ': '), ensure_ascii=False)
 
