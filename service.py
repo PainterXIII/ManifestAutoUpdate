@@ -90,11 +90,13 @@ shell_json = {
 # 初始的 app_id_list
 app_id_list = []
 
+# 待执行的 app_id 列表
+pending_app_id_list = []
+
 
 # 解析 JSON 输入并执行命令
 def execute_shell_command(shell_json):
     # 解析 JSON 字符串
-    # shell = json.loads(shell_json)
     username = shell_json["username"]
     app_id = shell_json["app_id"]
 
@@ -107,8 +109,19 @@ def execute_shell_command(shell_json):
         }
         return json.dumps(data, indent=4, separators=(',', ': '), ensure_ascii=False)
 
-    # 在 app_id_list 中记录当前 app_id
-    app_id_list.append(app_id)
+    # 检查 app_id_list 是否有空间，如果没有，则加入 pending_app_id_list
+    if len(app_id_list) >= 5:
+        pending_app_id_list.append(app_id)
+        log.info(f'App ID {app_id} is added to pending list. Waiting for space to run.')
+        data = {
+            "code": 202,
+            "msg": "系统繁忙,您的进程已加入等待队列"
+        }
+        return json.dumps(data, indent=4, separators=(',', ': '), ensure_ascii=False)
+    else:
+        # 在 app_id_list 中记录当前 app_id
+        app_id_list.append(app_id)
+        log.info(f'App ID {app_id} is added to running list.')
 
     # 启动新线程执行命令
     def run_command():
@@ -124,15 +137,70 @@ def execute_shell_command(shell_json):
             # 进程结束后应该删除 app_id
             if app_id in app_id_list:
                 app_id_list.remove(app_id)
+                log.info(f'App ID {app_id} is removed from running list.')
+                # 如果存在待处理的app_id,启动一个
+                if len(pending_app_id_list) > 0:
+                    next_app_id = pending_app_id_list.pop(0)
+                    log.info(f'App ID {next_app_id} is taken from pending list to run.')
+                    shell_json["app_id"] = next_app_id
+                    execute_shell_command(shell_json)  # 递归调用处理 next_app_id
 
     thread = Thread(target=run_command)
     thread.start()
 
     data = {
         "code": 200,
-        "msg": f"{app_id} 进程已启动,Thanks!"
+        "msg": f"{app_id} 进程已启动, Thanks!"
     }
     return json.dumps(data, indent=4, separators=(',', ': '), ensure_ascii=False)
+
+
+# 初始的 app_id_list
+# app_id_list = []
+#
+#
+# # 解析 JSON 输入并执行命令
+# def execute_shell_command(shell_json):
+#     # 解析 JSON 字符串
+#     # shell = json.loads(shell_json)
+#     username = shell_json["username"]
+#     app_id = shell_json["app_id"]
+#
+#     # 检测是否有进程在运行
+#     if app_id in app_id_list:
+#         log.info(f'App ID {app_id} is already running. Command will not be executed.')
+#         data = {
+#             "code": 201,
+#             "msg": "当前app_id的进程正在运行,请等待进程结束后再执行命令"
+#         }
+#         return json.dumps(data, indent=4, separators=(',', ': '), ensure_ascii=False)
+#
+#     # 在 app_id_list 中记录当前 app_id
+#     app_id_list.append(app_id)
+#
+#     # 启动新线程执行命令
+#     def run_command():
+#         try:
+#             command = f'python main.py -u -a {app_id} -U {username}'
+#             process = subprocess.Popen(command, shell=True)  # use shell=True to handle command as string
+#             log.info(f'Executing command: {command}')
+#             process.wait()  # 等待命令执行完成
+#             log.info(f'Command execution completed.')
+#         except Exception as e:
+#             print(f'An error occurred: {e}')
+#         finally:
+#             # 进程结束后应该删除 app_id
+#             if app_id in app_id_list:
+#                 app_id_list.remove(app_id)
+#
+#     thread = Thread(target=run_command)
+#     thread.start()
+#
+#     data = {
+#         "code": 200,
+#         "msg": f"{app_id} 进程已启动,Thanks!"
+#     }
+#     return json.dumps(data, indent=4, separators=(',', ': '), ensure_ascii=False)
 
 
 if __name__ == '__main__':
