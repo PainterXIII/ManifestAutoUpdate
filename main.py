@@ -75,7 +75,7 @@ def end(app_id, json_data):
 
     # 上传结果文件
     upload_file(result_path, f"gKeyConfig/{app_id}.txt")
-    upload_file(app_id_cache_path, f"depotcache/{app_id}/{app_id}_cache.txt")
+    upload_file(app_id_cache_path, f"depotcache/{app_id}/{app_id}.txt")
 
     # 清理临时文件
     cleanup_temp_files([app_id_cache_path])
