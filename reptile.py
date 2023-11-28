@@ -260,7 +260,7 @@ class ManifestAutoUpdate:
         self.log.debug(f'User {username}, paid app id list: ' + ','.join([str(i) for i in app_id_list]))
         self.log.info(f'User {username}: Waiting to get app info!')
         fresh_resp = self.retry(steam.get_product_info, app_id_list, retry_num=self.retry_num)
-        #self.log.info(f"fresh_resp: {fresh_resp}")
+        #self.log.info(f"fresh_resp: {fresh_resp['apps']}")
         if not fresh_resp:
             logging.error(f'User {username}: Failed to get app info!')
             return
@@ -297,20 +297,23 @@ class ManifestAutoUpdate:
             if 'common' in app and app['common']['type'].lower() in ['game', 'dlc', 'application']:
                 if 'depots' not in fresh_resp['apps'][app_id]:
                     continue
+                self.log.info(dlc)
                 # 先处理原有的depots
                 depots_to_process = fresh_resp['apps'][app_id]['depots']
                 # 此处添加将DLC depots合并到处理流程的代码
                 # 在这里，我们需要处理每个DLC的depots
-                for dlc_id in dlc:
-                    try:
-                        dlc_depots = fresh_resp['apps'][dlc_id]['depots']
-                        #self.log.info(f"now dlc_id: {dlc_id}")
-                        if dlc_depots:
-                            depots_to_process.update(dlc_depots)
-                    except Exception as e:
-                        # self.log.error(f"发生错误: {traceback.format_exc()}")
-                        self.log.error(f"{dlc_id} 未能解析到depot_id & gid")
-                        continue
+                for key, values_list in dlc.items():
+                    # 遍历与该键关联的值列表
+                    for value in values_list:
+                        #print(value)
+                        try:
+                            dlc_depots = fresh_resp['apps'][value]['depots']
+                            if dlc_depots:
+                                depots_to_process.update(dlc_depots)
+                        except Exception as e:
+                            # self.log.error(f"发生错误: {traceback.format_exc()}")
+                            self.log.error(f"{value} 未能解析到depot_id & gid")
+                            continue
                 counter = 0  # 初始化计数器
                 item = None  # 定义临时变量
                 for depot_id, depot in depots_to_process.items():

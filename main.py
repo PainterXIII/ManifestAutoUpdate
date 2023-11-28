@@ -161,7 +161,6 @@ if __name__ == '__main__':
             data[_app_id]["dlc"] = dlc[_app_id]
     log.info(json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')))
 
-    log.info(CDNClient.temp_json)
     # 爬虫进程结束,开始处理数据
     end(args.app_id_list[0], CDNClient.temp_json)
 
