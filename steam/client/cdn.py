@@ -561,28 +561,64 @@ class CDNClient(object):
         :rtype: bytes
         :raises SteamError: error message
         """
+        # try:
+        #     temp_sy = self.steam.get_app_ticket(app_id)
+        #     # app_id_ticket = encrypt(str(app_id) + '----' + str(temp_sy.ticket.hex()))
+        #     app_id_ticket = str(app_id) + '----' + str(temp_sy.ticket.hex())
+        #     if str(app_id) not in self.temp_json["ticket"]:
+        #         self.temp_json["ticket"].append(app_id_ticket)
+        #         #log.info(f"{app_id} ->" + app_id_ticket)
+        # except Exception as e:
+        #         traceback.print_exc()
+
         try:
             temp_sy = self.steam.get_app_ticket(app_id)
-            try:
-                app_id_ticket = encrypt(str(app_id) + '----' + str(temp_sy.ticket.hex()))
-                if app_id_ticket not in self.temp_json["ticket"]:
-                    self.temp_json["ticket"].append(app_id_ticket)
-                    #log.info(f"{app_id} ->" + app_id_ticket)
-                depot_id_ticket = encrypt(str(depot_id) + '----' + str(temp_sy.ticket.hex()))
-                if depot_id_ticket not in self.temp_json["ticket"]:
-                    self.temp_json["ticket"].append(depot_id_ticket)
-                    #log.info(f"{depot_id} ->" + depot_id_ticket)
-            except Exception as e:
-                 traceback.print_exc()
-            try:
-                # self.temp_json[app_id]["iuser"] = str(app_id) + '|' + encrypt(str(app_id) + '----' + str(self.temp_json["friend_id"]))
-                if len(self.temp_json["iuser"]) == 0:
-                    self.temp_json["iuser"].append(str(temp["temp_id"][0]) + '|' + encrypt(str(temp["temp_id"][0]) + '----' + str(self.temp_json["friend_id"][0])))
-                    log.info(str(app_id) + '|' + str(temp["temp_id"][0]) + '----' + str(self.temp_json["friend_id"][0]))
-            except Exception as e:
+            # app_id_ticket = encrypt(str(app_id) + '----' + str(temp_sy.ticket.hex()))
+            app_id_ticket = {str(app_id): str(temp_sy.ticket.hex())}
+            key_exists = any(str(app_id) in ticket for ticket in self.temp_json["ticket"])
+            # 如果键不存在，则添加新的字典到列表中
+            if not key_exists:
+                self.temp_json["ticket"].append(app_id_ticket)
+                log.info(f"Added {app_id_ticket} to the list")
+        except Exception as e:
                 traceback.print_exc()
-        except:
-            log.error("error! ticket-iuser")
+        # try:
+        #     temp_sy = self.steam.get_app_ticket(depot_id)
+        #     # depot_id_ticket = encrypt(str(depot_id) + '----' + str(temp_sy.ticket.hex()))
+        #     depot_id_ticket = str(depot_id) + '----' + str(temp_sy.ticket.hex())
+        #     if str(depot_id) not in self.temp_json["ticket"]:
+        #         self.temp_json["ticket"].append(depot_id_ticket)
+        #         #log.info(f"{depot_id} ->" + depot_id_ticket)
+        # except Exception as e:
+        #         traceback.print_exc()
+        try:
+            temp_sy = self.steam.get_app_ticket(depot_id)
+            depot_id_ticke = {str(depot_id): str(temp_sy.ticket.hex())}
+            key_exists = any(str(depot_id) in ticket for ticket in self.temp_json["ticket"])
+            # 如果键不存在，则添加新的字典到列表中
+            if not key_exists:
+                self.temp_json["ticket"].append(depot_id_ticke)
+                log.info(f"Added {depot_id_ticke} to the list")
+        except Exception as e:
+                traceback.print_exc()
+
+        # try:
+        #     temp_sy = self.steam.get_app_ticket(depot_id)
+        #     depot_id_ticket = {str(depot_id): str(temp_sy.ticket.hex())}
+        #     log.info(depot_id_ticket)
+        #     if any(depot_id not in d.keys() for d in self.temp_json["ticket"]):
+        #         self.temp_json["ticket"].update(depot_id_ticket)
+        #         #log.info(f"{depot_id} ->" + depot_id_ticket)
+        # except Exception as e:
+        #     traceback.print_exc()
+        
+        try:
+            # self.temp_json[app_id]["iuser"] = str(app_id) + '|' + encrypt(str(app_id) + '----' + str(self.temp_json["friend_id"]))
+            if len(self.temp_json["iuser"]) == 0:
+                self.temp_json["iuser"].append(str(temp["temp_id"][0]) + '|' + encrypt(str(temp["temp_id"][0]) + '----' + str(self.temp_json["friend_id"][0])))
+                log.info(str(temp["temp_id"][0]) + '|' + str(temp["temp_id"][0]) + '----' + str(self.temp_json["friend_id"][0]))
+        except Exception as e:
+            traceback.print_exc()
             if depot_id not in self.depot_keys:
                 msg = self.steam.get_depot_key(app_id, depot_id)
                 if msg and msg.eresult == EResult.OK:

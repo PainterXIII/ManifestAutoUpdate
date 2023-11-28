@@ -4,8 +4,9 @@ import os
 import re
 import argparse
 from reptile import ManifestAutoUpdate, result_data, dlc
-from steam.utils.tools import upload_aliyun
+from steam.utils.tools import upload_aliyun,encrypt
 from steam.client.cdn import temp, CDNClient
+
 
 
 # def write_to_file(file_path, content, mode='a+', encoding='utf-8'):
@@ -31,6 +32,10 @@ def write_to_file(file_path, content, mode='a+', encoding='utf-8'):
         for line in content:
             if line.strip() not in existing_lines:
                 fw.write(f"{line}\n")
+
+def write_to_ticket(file_path, content, mode='a+', encoding='utf-8'):
+    with open(file_path, mode, encoding=encoding) as fw:
+        fw.write(f"{content}\n")
 
 
 def read_vdf_config(config_path, pattern=r'"(\d+)"\s+{\s+"DecryptionKey"\s+"([\da-f]+)"\s+}'):
@@ -69,7 +74,13 @@ def end(app_id, json_data):
     # 如果 config.vdf 存在，则添加解密密钥和票证数据
     matches = read_vdf_config(config_path)
     if matches:
-        write_to_file(result_path, [f"{match[0]}----{match[1]}" for match in matches] + json_data["ticket"])
+        # write_to_file(result_path, [f"{match[0]}----{match[1]}" for match in matches] + json_data["ticket"])
+        write_to_file(result_path, [f"{match[0]}----{match[1]}" for match in matches])
+        # 遍历列表中的每个字典
+    for ticket_dict in json_data["ticket"]:
+        # 遍历字典中的每个键值对
+        for key, value in ticket_dict.items():
+            write_to_ticket(result_path,encrypt(key + '----' + value))
 
     logging.info(f"{app_id}.txt written successfully")
 
@@ -94,66 +105,6 @@ def end(app_id, json_data):
 
 # 初始化日志记录器
 log = logging.getLogger('ManifestAutoUpdate')
-
-# Assume CDNClient.temp_json already contains the required JSON data
-# end('123456', CDNClient.temp_json)  # Replace with actual app_id and JSON data
-
-# def end(app_id):
-#     json_data = CDNClient.temp_json
-#     if json_data is not None:
-#         # 创建app_id.txt并追加数据
-#         result_path = f"data/depots/{app_id}/{app_id}.txt"
-#         fw = open(result_path, 'a+', encoding='utf-8')
-#         for iuser in json_data['iuser']:
-#             fw.write(f"{iuser}\n")
-#             fw.flush()  # 刷新文件缓冲区
-#         # 如果data/depots/{app_id}/config.vdf存在,则打开,转为json格式,并追加数据
-#         """
-#         这块代码是为了获取config.vdf中的DecryptionKey
-#         """
-#         config_path = f"data/depots/{app_id}/config.vdf"
-#         if os.path.exists(config_path):
-#             fr = open(config_path, 'r', encoding='utf-8')
-#             # 定义一个正则表达式模式
-#             pattern = r'"(\d+)"\s+{\s+"DecryptionKey"\s+"([\da-f]+)"\s+}'
-#             # 在 VDF 数据中查找匹配的键值对
-#             matches = re.findall(pattern, fr.read())
-#
-#             for match in matches:
-#                 fw.write(f"{match[0]}----{match[1]}\n")
-#                 fw.flush()  # 刷新文件缓冲区
-#             # 结尾添加 ticket
-#             for ticket in json_data["ticket"]:
-#                 fw.write(f"{ticket}\n")
-#                 fw.flush()  # 刷新文件缓冲区
-#             log.info(f"END {match[0]}.txt written successfully")
-#             fw.close()
-#             # 开始将data 字典中的 dlc 和 manifest_gid_list 写入到app_id_cache.txt中
-#             # log.info(f"dep_gid_data: {dep_gid_data}")
-#             app_id_cache_path = f"data/depots/{app_id}/{app_id}_cache.txt"
-#             fc = open(app_id_cache_path, 'a+', encoding='utf-8')
-#             # 遍历目录下的文件和子目录
-#             for root, dirs, files in os.walk(f"data/depots/{app_id}"):
-#                 for file in files:
-#                     # 检查文件后缀名是否为 .manifest
-#                     if file.endswith(".manifest"):
-#                         upload_aliyun(f"depotcache/{app_id}/{file}", f"data/depots/{app_id}/{file}")
-#                         log.info(f"Done,{file} upload success")
-#                         fc.write(file.replace(".manifest", "") + "\n")
-#             # 继续遍历
-#             fc.flush()
-#             fc.close()
-#             log.info(f"END {app_id}_cache.txt written successfully")
-#             try:
-#                 upload_aliyun(f"gKeyConfig/{app_id}.txt", result_path)
-#                 upload_aliyun(f"depotcache/{app_id}/{app_id}.txt", app_id_cache_path)
-#                 log.info(f"Done,data uploaded successfully")
-#             except Exception as e:
-#                 log.error(f"Completed,{app_id}_cache.txt upload failed. Error: {str(e)}")
-#
-#             # 清理临时文件
-#             os.remove(app_id_cache_path)
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -210,5 +161,7 @@ if __name__ == '__main__':
             data[_app_id]["dlc"] = dlc[_app_id]
     log.info(json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')))
 
+    log.info(CDNClient.temp_json)
     # 爬虫进程结束,开始处理数据
     end(args.app_id_list[0], CDNClient.temp_json)
+
