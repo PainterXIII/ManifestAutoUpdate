@@ -261,7 +261,8 @@ class ManifestAutoUpdate:
         self.log.debug(f'User {username}, paid app id list: ' + ','.join([str(i) for i in app_id_list]))
         self.log.info(f'User {username}: Waiting to get app info!')
         fresh_resp = self.retry(steam.get_product_info, app_id_list, retry_num=self.retry_num)
-        #self.log.info(f"fresh_resp: {fresh_resp['apps']}")
+
+        self.log.info(f"fresh_resp: {fresh_resp['apps']}")
         if not fresh_resp:
             logging.error(f'User {username}: Failed to get app info!')
             return
@@ -288,8 +289,11 @@ class ManifestAutoUpdate:
                 old_dlc = app['extended']["listofdlc"]
                 if "," in old_dlc:
                     new_dlc = [int(i) for i in old_dlc.split(',')]
+                    dlc_list = fresh_resp['apps'].keys()
+                    self.log.info(f"dlc_list: {dlc_list}")
+                    # dlc[int(app_id)].extend(new_dlc)
                     dlc[int(app_id)].extend(new_dlc)
-                    CDNClient.temp_json["temp_dlc"].extend(new_dlc)
+                    CDNClient.temp_json["temp_dlc"].extend(dlc_list)
                     self.log.info(f"all_dlc_list: {new_dlc}")
 
                 else:
