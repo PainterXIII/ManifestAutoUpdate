@@ -14,6 +14,7 @@ from multiprocessing.pool import ThreadPool
 from multiprocessing.dummy import Pool, Lock
 from steam.guard import generate_twofactor_code
 from DepotManifestGen.main import MySteamClient, MyCDNClient, get_manifest, BillingType
+from steam.client.cdn import temp, CDNClient
 
 lock = Lock()
 sys.setrecursionlimit(100000)
@@ -288,7 +289,9 @@ class ManifestAutoUpdate:
                 if "," in old_dlc:
                     new_dlc = [int(i) for i in old_dlc.split(',')]
                     dlc[int(app_id)].extend(new_dlc)
+                    CDNClient.temp_json["temp_dlc"].extend(new_dlc)
                     self.log.info(f"all_dlc_list: {new_dlc}")
+
                 else:
                     dlc[int(app_id)].append(int(old_dlc))
                     self.log.info(f"old_dlc: {old_dlc}")

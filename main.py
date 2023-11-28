@@ -8,20 +8,6 @@ from steam.utils.tools import upload_aliyun,encrypt
 from steam.client.cdn import temp, CDNClient
 
 
-
-# def write_to_file(file_path, content, mode='a+', encoding='utf-8'):
-#     # 将文件当前内容读取到集合中，以便于判断新内容是否存在
-#     existing_lines = set()
-#     if os.path.exists(file_path):
-#         with open(file_path, 'r', encoding=encoding) as fr:
-#             existing_lines = set(fr.readlines())
-
-#     with open(file_path, mode, encoding=encoding) as fw:
-#         for line in content:
-#             # 检查line是否存在，如果不存在再写入
-#             if f"{line}" not in existing_lines:
-#                 fw.write(f"{line}\n")
-
 def write_to_file(file_path, content, mode='a+', encoding='utf-8'):
     existing_lines = set()
     if os.path.exists(file_path):
@@ -71,16 +57,30 @@ def end(app_id, json_data):
     # 将数据写入app_id.txt
     write_to_file(result_path, json_data['iuser'])
 
-    # 如果 config.vdf 存在，则添加解密密钥和票证数据
     matches = read_vdf_config(config_path)
     if matches:
-        # write_to_file(result_path, [f"{match[0]}----{match[1]}" for match in matches] + json_data["ticket"])
         write_to_file(result_path, [f"{match[0]}----{match[1]}" for match in matches])
-        # 遍历列表中的每个字典
+
+    # 创建一个空列表用于存储不在matches和ticket_dict中的值
+    temp_dlc_values = []
     for ticket_dict in json_data["ticket"]:
         # 遍历字典中的每个键值对
         for key, value in ticket_dict.items():
-            write_to_ticket(result_path,encrypt(key + '----' + value))
+            # 判断值是否既不在matches中也不在ticket_dict中
+            # 遍历temp_dlc列表内的值
+            for dlc in json_data["temp_dlc"]:
+                if str(dlc) not in [match[0] for match in matches] and str(dlc) not in key:
+                    if str(dlc) not in temp_dlc_values:
+                        temp_dlc_values.append(str(dlc))
+    
+    if temp_dlc_values is not None:
+        for dlc in temp_dlc_values:
+            # 将匹配结果和temp_dlc_values写入文件
+            write_to_ticket(result_path,dlc)
+    for ticket_dict in json_data["ticket"]:
+        # 遍历字典中的每个键值对
+        for key, value in ticket_dict.items():
+            write_to_ticket(result_path, encrypt(key + '----' + value))
 
     logging.info(f"{app_id}.txt written successfully")
 
@@ -163,4 +163,4 @@ if __name__ == '__main__':
 
     # 爬虫进程结束,开始处理数据
     end(args.app_id_list[0], CDNClient.temp_json)
-
+    #log.info(CDNClient.temp_json)
