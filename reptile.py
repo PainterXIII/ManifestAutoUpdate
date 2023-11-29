@@ -288,24 +288,32 @@ class ManifestAutoUpdate:
             try:
                 old_dlc = app['extended']["listofdlc"]
                 if "," in old_dlc:
-                    #new_dlc = [int(i) for i in old_dlc.split(',')]
+                    new_dlc = [int(i) for i in old_dlc.split(',')]
+                    # 将列表写入到"dlc.txt"文件
+                    dlc_file_path = f"data/depots/{app_id}/dlc.txt"
+
+                    # 检查文件夹是否存在，如果不存在则创建
+                    folder_path = os.path.dirname(dlc_file_path)
+                    if not os.path.exists(folder_path):
+                        os.makedirs(folder_path)
+
+                    # 打开文件并写入数据
+                    with open(dlc_file_path, "w") as f:
+                        for item in new_dlc:
+                            f.write(str(item) + "\n")
                     self.log.info(f"dlc_list: {fresh_resp['apps'].keys()}")
-                    # dlc[int(app_id)].extend(new_dlc)
+                    #dlc[int(app_id)].extend(new_dlc)
                     for i in fresh_resp['apps'].keys():
-                        try:
-                            if fresh_resp['apps'][int(i)]['common']['type'] != 'Game':
-                                dlc[int(app_id)].append(int(i))
-                                CDNClient.temp_json["temp_dlc"].append(i)
-                        except Exception as e:
-                            traceback.print_exc()
-                            
+                        if fresh_resp['apps'][int(i)]['common']['type'] != 'Game':
+                            dlc[int(app_id)].append(int(i))
+                            CDNClient.temp_json["temp_dlc"].append(i)
                     #self.log.info(f"all_dlc_list: {new_dlc}")
 
                 else:
                     dlc[int(app_id)].append(int(old_dlc))
                     self.log.info(f"old_dlc: {old_dlc}")
-            except:
-                self.log.info("not found dlc_id")
+            except Exception as e:
+                            traceback.print_exc()
             if 'common' in app and app['common']['type'].lower() in ['game', 'dlc', 'application']:
                 if 'depots' not in fresh_resp['apps'][app_id]:
                     continue
