@@ -288,13 +288,17 @@ class ManifestAutoUpdate:
             try:
                 old_dlc = app['extended']["listofdlc"]
                 if "," in old_dlc:
-                    new_dlc = [int(i) for i in old_dlc.split(',')]
+                    #new_dlc = [int(i) for i in old_dlc.split(',')]
                     self.log.info(f"dlc_list: {fresh_resp['apps'].keys()}")
                     # dlc[int(app_id)].extend(new_dlc)
-                    for i in new_dlc:
-                        if fresh_resp['apps'][int[i]]['common']['type'] != 'Game':
-                            dlc[int(app_id)].append(int[i])
-                            CDNClient.temp_json["temp_dlc"].append(i)
+                    for i in fresh_resp['apps'].keys():
+                        try:
+                            if fresh_resp['apps'][int(i)]['common']['type'] != 'Game':
+                                dlc[int(app_id)].append(int(i))
+                                CDNClient.temp_json["temp_dlc"].append(i)
+                        except Exception as e:
+                            traceback.print_exc()
+                            
                     #self.log.info(f"all_dlc_list: {new_dlc}")
 
                 else:
