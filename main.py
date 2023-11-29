@@ -4,7 +4,7 @@ import os
 import re
 import argparse
 from reptile import ManifestAutoUpdate, result_data, dlc
-from steam.utils.tools import upload_aliyun,encrypt
+from steam.utils.tools import upload_aliyun, encrypt
 from steam.client.cdn import temp, CDNClient
 
 
@@ -18,6 +18,7 @@ def write_to_file(file_path, content, mode='a+', encoding='utf-8'):
         for line in content:
             if line.strip() not in existing_lines:
                 fw.write(f"{line}\n")
+
 
 def write_to_ticket(file_path, content, mode='a+', encoding='utf-8'):
     with open(file_path, mode, encoding=encoding) as fw:
@@ -63,6 +64,11 @@ def end(app_id, json_data):
 
     # 创建一个空列表用于存储不在matches和ticket_dict中的值
     temp_dlc_values = []
+    # 判断data/depots/dlc.txt是否存在,存在则读取内容添加到json_data["temp_dlc"]
+    if os.path.exists(f"data/depots/{app_id}/dlc.txt"):
+        with open(f"data/depots/{app_id}/dlc.txt", 'r', encoding='utf-8') as f:
+            for line in f.readlines():
+                json_data["temp_dlc"].append(line.strip())
     for ticket_dict in json_data["ticket"]:
         # 遍历字典中的每个键值对
         for key, value in ticket_dict.items():
@@ -72,11 +78,11 @@ def end(app_id, json_data):
                 if str(dlc) not in [match[0] for match in matches] and str(dlc) not in key:
                     if str(dlc) not in temp_dlc_values:
                         temp_dlc_values.append(str(dlc))
-    
+
     if temp_dlc_values is not None:
         for dlc in temp_dlc_values:
             # 将匹配结果和temp_dlc_values写入文件
-            write_to_ticket(result_path,dlc)
+            write_to_ticket(result_path, dlc)
     for ticket_dict in json_data["ticket"]:
         # 遍历字典中的每个键值对
         for key, value in ticket_dict.items():
@@ -163,4 +169,4 @@ if __name__ == '__main__':
 
     # 爬虫进程结束,开始处理数据
     end(args.app_id_list[0], CDNClient.temp_json)
-    #log.info(CDNClient.temp_json)
+    # log.info(CDNClient.temp_json)

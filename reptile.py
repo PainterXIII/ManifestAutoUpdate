@@ -290,7 +290,7 @@ class ManifestAutoUpdate:
                 if "," in old_dlc:
                     new_dlc = [int(i) for i in old_dlc.split(',')]
                     # 将列表写入到"dlc.txt"文件
-                    dlc_file_path = f"data/depots/{app_id}/dlc.txt"
+                    dlc_file_path = f"data/depots/{app_id}/listdlc.txt"
 
                     # 检查文件夹是否存在，如果不存在则创建
                     folder_path = os.path.dirname(dlc_file_path)
