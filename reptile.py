@@ -322,16 +322,17 @@ class ManifestAutoUpdate:
                     continue
                 self.log.info(dlc)
                 # 先处理原有的depots
+                #self.log.info(fresh_resp['apps'][app_id]['depots'])
                 depots_to_process = fresh_resp['apps'][app_id]['depots']
+                #self.log.info(depots_to_process)
                 # 此处添加将DLC depots合并到处理流程的代码
                 # 在这里，我们需要处理每个DLC的depots
                 for key, values_list in dlc.items():
                     # 遍历与该键关联的值列表
                     for value in values_list:
-                        #print(value)
                         try:
                             dlc_depots = fresh_resp['apps'][value]['depots']
-                            if dlc_depots:
+                            if 'manifests' in dlc_depots:
                                 depots_to_process.update(dlc_depots)
                         except Exception as e:
                             # self.log.error(f"发生错误: {traceback.format_exc()}")
@@ -339,7 +340,7 @@ class ManifestAutoUpdate:
                             continue
                 counter = 0  # 初始化计数器
                 item = None  # 定义临时变量
-                #self.log.info(depots_to_process.items())
+                #self.log.info(depots_to_process)
                 for depot_id, depot in depots_to_process.items():
                     self.log.info(f"depot_id: {depot_id}")
                     with lock:
@@ -352,12 +353,13 @@ class ManifestAutoUpdate:
                                     result_data[int(app_id)][int(depot_id)] = set()
                             except KeyError:
                                 self.log.error("Error adding depot_id to result_data")
-                    if 'manifests' in depot and 'public' in depot['manifests'] and int(depot_id) in {
-                        *cdn.licensed_depot_ids, *cdn.licensed_app_ids}:
+                    # if 'manifests' in depot and 'public' in depot['manifests'] and int(depot_id) in {
+                    #     *cdn.licensed_depot_ids, *cdn.licensed_app_ids}:
+                    if 'manifests' in depot and 'public' in depot['manifests']:
                         try:
                             manifest_gid = depot['manifests']['public']
                         except KeyError:
-                            self.log.error("No public manifest for this depot")
+                            self.log.error(f"No public manifest for this depot {depot_id}")
                             continue
 
                         if isinstance(manifest_gid, dict):
