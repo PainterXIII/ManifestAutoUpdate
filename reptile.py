@@ -262,7 +262,7 @@ class ManifestAutoUpdate:
         self.log.info(f'User {username}: Waiting to get app info!')
         fresh_resp = self.retry(steam.get_product_info, app_id_list, retry_num=self.retry_num)
 
-        self.log.info(f"fresh_resp: {json.dumps(fresh_resp['apps'])}")
+        #self.log.info(f"fresh_resp: {json.dumps(fresh_resp['apps'])}")
         if not fresh_resp:
             logging.error(f'User {username}: Failed to get app info!')
             return
@@ -339,8 +339,9 @@ class ManifestAutoUpdate:
                             continue
                 counter = 0  # 初始化计数器
                 item = None  # 定义临时变量
+                #self.log.info(depots_to_process.items())
                 for depot_id, depot in depots_to_process.items():
-                    #self.log.info(f"depot_id: {depot_id}")
+                    self.log.info(f"depot_id: {depot_id}")
                     with lock:
                         if depot_id.isdigit():
                             self.app_lock[int(app_id)].add(depot_id)
