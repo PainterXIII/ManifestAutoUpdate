@@ -250,8 +250,9 @@ class ManifestAutoUpdate:
                 return
             if cdn.packages_info:
                 for package_id, info in product_info['packages'].items():
-                    if 'depotids' in info and info['depotids'] and info['billingtype'] in BillingType.PaidList:
-                        app_id_list.extend(list(info['appids'].values()))
+                    #if 'depotids' in info and info['depotids'] and info['billingtype'] in BillingType.PaidList:
+                    # if 'depotids' in info and info['depotids']:
+                    app_id_list.extend(list(info['appids'].values()))
         self.log.info(f'User {username}: {len(app_id_list)} paid app found!')
         if not app_id_list:
             self.user_info[username]['enable'] = False
@@ -263,13 +264,20 @@ class ManifestAutoUpdate:
         fresh_resp = self.retry(steam.get_product_info, app_id_list, retry_num=self.retry_num)
 
         #self.log.info(f"fresh_resp: {json.dumps(fresh_resp['apps'])}")
+        # 打开文件
+        with open("log.txt", "w") as file:
+            # 写入代码行
+            file.write(json.dumps(fresh_resp['apps']))
+            # 关闭文件
+            file.close()
+        self.log.info("代码已成功写入文件。")
         if not fresh_resp:
             logging.error(f'User {username}: Failed to get app info!')
             return
         job_list = []
         flag = True
         self.log.info(f"User {username}: {app_id_list}")
-
+        self.log.info(f"self.update_app_id_list: {self.update_app_id_list}")
         for app_id in app_id_list:
             if int(app_id) not in self.update_app_id_list:
                 continue
@@ -308,6 +316,8 @@ class ManifestAutoUpdate:
                             if fresh_resp['apps'][int(i)]['common']['type'] != 'Game':
                                 dlc[int(app_id)].append(int(i))
                                 CDNClient.temp_json["temp_dlc"].append(i)
+                    except KeyError:
+                        self.log.info(f"{i} 未能解析到common")
                     except Exception as e:
                             traceback.print_exc()
                     #self.log.info(f"all_dlc_list: {new_dlc}")
@@ -332,15 +342,22 @@ class ManifestAutoUpdate:
                     for value in values_list:
                         try:
                             dlc_depots = fresh_resp['apps'][value]['depots']
-                            if 'manifests' in dlc_depots:
+                            #depots_to_process.update(dlc_depots)
+                            if value == 1780970:
+                                self.log.info(dlc_depots)
+                            if 'manifests' in str(dlc_depots) and "gid" in str(dlc_depots):
                                 depots_to_process.update(dlc_depots)
+                            # if any("manifests" in d for d in dlc_depots.values()):
+                            #     depots_to_process.update(dlc_depots)
+                            else:
+                                self.log.info(f"{value} 未能解析到manifests")
                         except Exception as e:
                             # self.log.error(f"发生错误: {traceback.format_exc()}")
                             self.log.error(f"{value} 未能解析到depot_id & gid")
                             continue
                 counter = 0  # 初始化计数器
                 item = None  # 定义临时变量
-                #self.log.info(depots_to_process)
+                self.log.info(json.dumps(depots_to_process))
                 for depot_id, depot in depots_to_process.items():
                     self.log.info(f"depot_id: {depot_id}")
                     with lock:
@@ -353,9 +370,9 @@ class ManifestAutoUpdate:
                                     result_data[int(app_id)][int(depot_id)] = set()
                             except KeyError:
                                 self.log.error("Error adding depot_id to result_data")
-                    # if 'manifests' in depot and 'public' in depot['manifests'] and int(depot_id) in {
-                    #     *cdn.licensed_depot_ids, *cdn.licensed_app_ids}:
-                    if 'manifests' in depot and 'public' in depot['manifests']:
+                    if 'manifests' in depot and 'public' in depot['manifests'] and int(depot_id) in {
+                        *cdn.licensed_depot_ids, *cdn.licensed_app_ids}:
+                    # if 'manifests' in depot and 'public' in depot['manifests']:
                         try:
                             manifest_gid = depot['manifests']['public']
                         except KeyError:
