@@ -7,6 +7,17 @@ from reptile import ManifestAutoUpdate, result_data, dlc
 from steam.utils.tools import upload_aliyun, encrypt
 from steam.client.cdn import temp, CDNClient
 
+def delete_files(folder_path):
+    if os.path.exists(folder_path):  # 检查文件夹是否存在
+        for root, dirs, files in os.walk(folder_path):
+            for file in files:
+                if file != 'dlc.txt':  # 指定要保留的文件名，其他文件将被删除
+                    file_path = os.path.join(root, file)
+                    os.remove(file_path)
+        log.info(f"{folder_path} 删除成功")
+    else:
+        log.info(f"{folder_path} 不存在,开始爬取")
+
 
 def write_to_file(file_path, content, mode='a+', encoding='utf-8'):
     existing_lines = set()
@@ -113,6 +124,7 @@ def end(app_id, json_data):
 log = logging.getLogger('ManifestAutoUpdate')
 
 if __name__ == '__main__':
+    
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--credential-location', default=None)
     parser.add_argument('-l', '--level', default='INFO')
@@ -129,6 +141,7 @@ if __name__ == '__main__':
     parser.add_argument('-U', '--users', dest='user_list', action='extend', nargs='*')
     args = parser.parse_args()
     temp["temp_id"].append(args.app_id_list[0])  # 将app_id赋给cdn.py
+    delete_files(f"data/depots/{args.app_id_list[0]}")
     log.info(args)
     ManifestAutoUpdate(args.credential_location, level=args.level, pool_num=args.pool_num, retry_num=args.retry_num,
                        update_wait_time=args.update_wait_time, key=args.key, init_only=args.init_only,

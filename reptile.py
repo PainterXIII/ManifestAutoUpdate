@@ -277,7 +277,7 @@ class ManifestAutoUpdate:
         job_list = []
         flag = True
         self.log.info(f"User {username}: {app_id_list}")
-        self.log.info(f"self.update_app_id_list: {self.update_app_id_list}")
+        #self.log.info(f"self.update_app_id_list: {self.update_app_id_list}")
         for app_id in app_id_list:
             if int(app_id) not in self.update_app_id_list:
                 continue
@@ -309,7 +309,7 @@ class ManifestAutoUpdate:
                     with open(dlc_file_path, "w") as f:
                         for item in new_dlc:
                             f.write(str(item) + "\n")
-                    self.log.info(f"dlc_list: {fresh_resp['apps'].keys()}")
+                    #self.log.info(f"dlc_list: {fresh_resp['apps'].keys()}")
                     #dlc[int(app_id)].extend(new_dlc)
                     try:
                         for i in fresh_resp['apps'].keys():
