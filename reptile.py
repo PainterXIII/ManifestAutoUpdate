@@ -214,7 +214,7 @@ class ManifestAutoUpdate:
         if result == EResult.OK:
             # print('friends set:',)
             self.log.info(f'User {username} login successfully!')
-            self.delete_files(f"data/depots/{self.update_app_id_list[0]}")
+            #self.delete_files(f"data/depots/{self.update_app_id_list[0]}")
         else:
             self.log.error(f'User {username}: Login failure reason: {result.__repr__()}')
         return result

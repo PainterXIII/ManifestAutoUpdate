@@ -29,7 +29,7 @@ parser.add_argument('-i', '--login-id', required=False)
 parser.add_argument('-c', '--cli', action='store_true', required=False)
 parser.add_argument('-L', '--level', required=False, default='INFO')
 parser.add_argument('-C', '--credential-location', required=False)
-parser.add_argument('-r', '--remove-old', action='store_true', required=False)
+parser.add_argument('-r', '--remove-old', action='store_true', required=True)
 
 
 class BillingType:

@@ -115,8 +115,14 @@ def end(app_id, json_data):
     # 上传结果文件
     if os.path.exists(result_path):
         upload_file(result_path, f"gKeyConfig/{app_id}.txt")
-
-    if os.path.exists(app_id_cache_path):
+    
+    # 判断data/depots/{app_id}路径下是否有.manifest结尾的文件
+    # for root, dirs, files in os.walk(f"data/depots/{app_id}"):
+    #     for file in files:
+    #         if file.endswith(".manifest"):
+    #             upload_file(app_id_cache_path, f"depotcache/{app_id}/{app_id}.txt")
+    #             cleanup_temp_files([app_id_cache_path])
+    # if os.path.exists(app_id_cache_path):
         upload_file(app_id_cache_path, f"depotcache/{app_id}/{app_id}.txt")
         cleanup_temp_files([app_id_cache_path])
     # upload_file(result_path, f"gKeyConfig/{app_id}.txt")
