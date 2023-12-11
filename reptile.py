@@ -161,6 +161,17 @@ class ManifestAutoUpdate:
             except Exception as e:
                 self.log.error(e)
                 return
+            
+    def delete_files(self, folder_path):
+        if os.path.exists(folder_path):  # 检查文件夹是否存在
+            for root, dirs, files in os.walk(folder_path):
+                for file in files:
+                    if file != 'dlc.txt':  # 指定要保留的文件名，其他文件将被删除
+                        file_path = os.path.join(root, file)
+                        os.remove(file_path)
+            self.log.warning(f"{folder_path} 删除成功")
+        else:
+            self.log.warning(f"{folder_path} 不存在,开始爬取")
 
     def login(self, steam, username, password):
         self.log.info(f'Logging in to account {username}!')
@@ -203,6 +214,7 @@ class ManifestAutoUpdate:
         if result == EResult.OK:
             # print('friends set:',)
             self.log.info(f'User {username} login successfully!')
+            self.delete_files(f"data/depots/{self.update_app_id_list[0]}")
         else:
             self.log.error(f'User {username}: Login failure reason: {result.__repr__()}')
         return result
@@ -270,7 +282,7 @@ class ManifestAutoUpdate:
             file.write(json.dumps(fresh_resp['apps']))
             # 关闭文件
             file.close()
-        self.log.info("代码已成功写入文件。")
+        self.log.info("json已成功写入log.txt...")
         if not fresh_resp:
             logging.error(f'User {username}: Failed to get app info!')
             return
@@ -343,8 +355,8 @@ class ManifestAutoUpdate:
                         try:
                             dlc_depots = fresh_resp['apps'][value]['depots']
                             #depots_to_process.update(dlc_depots)
-                            if value == 1780970:
-                                self.log.info(dlc_depots)
+                            # if value == 1780970:
+                            #     self.log.info(dlc_depots)
                             if 'manifests' in str(dlc_depots) and "gid" in str(dlc_depots):
                                 depots_to_process.update(dlc_depots)
                             # if any("manifests" in d for d in dlc_depots.values()):
@@ -357,7 +369,7 @@ class ManifestAutoUpdate:
                             continue
                 counter = 0  # 初始化计数器
                 item = None  # 定义临时变量
-                self.log.info(json.dumps(depots_to_process))
+                #self.log.info(json.dumps(depots_to_process))
                 for depot_id, depot in depots_to_process.items():
                     self.log.info(f"depot_id: {depot_id}")
                     with lock:

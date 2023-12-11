@@ -113,11 +113,16 @@ def end(app_id, json_data):
     logging.info(f"{app_id}_cache.txt written successfully")
 
     # 上传结果文件
-    upload_file(result_path, f"gKeyConfig/{app_id}.txt")
-    upload_file(app_id_cache_path, f"depotcache/{app_id}/{app_id}.txt")
+    if os.path.exists(result_path):
+        upload_file(result_path, f"gKeyConfig/{app_id}.txt")
 
-    # 清理临时文件
-    cleanup_temp_files([app_id_cache_path])
+    if os.path.exists(app_id_cache_path):
+        upload_file(app_id_cache_path, f"depotcache/{app_id}/{app_id}.txt")
+        cleanup_temp_files([app_id_cache_path])
+    # upload_file(result_path, f"gKeyConfig/{app_id}.txt")
+    # upload_file(app_id_cache_path, f"depotcache/{app_id}/{app_id}.txt")
+    # # 清理临时文件
+    # cleanup_temp_files([app_id_cache_path])
 
 
 # 初始化日志记录器
@@ -141,7 +146,6 @@ if __name__ == '__main__':
     parser.add_argument('-U', '--users', dest='user_list', action='extend', nargs='*')
     args = parser.parse_args()
     temp["temp_id"].append(args.app_id_list[0])  # 将app_id赋给cdn.py
-    delete_files(f"data/depots/{args.app_id_list[0]}")
     log.info(args)
     ManifestAutoUpdate(args.credential_location, level=args.level, pool_num=args.pool_num, retry_num=args.retry_num,
                        update_wait_time=args.update_wait_time, key=args.key, init_only=args.init_only,
