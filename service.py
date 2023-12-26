@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import subprocess
+import threading
 from threading import Thread
 
 log = logging.getLogger('service')
@@ -96,6 +97,18 @@ pending_app_id_list = []
 
 # 解析 JSON 输入并执行命令
 def execute_shell_command(shell_json):
+    # 创建一个计时器，在超时后检查并删除进程 ID
+    def timeout_handler():
+        if app_id in app_id_list:
+            app_id_list.remove(app_id)
+            log.info(f'App ID {app_id} is forcefully removed from running list due to timeout.')
+            # 如果存在待处理的 app_id，则启动一个
+            if len(pending_app_id_list) > 0:
+                next_app_id = pending_app_id_list.pop(0)
+                log.info(f'App ID {next_app_id} is taken from pending list to run.')
+                shell_json["app_id"] = next_app_id
+                execute_shell_command(shell_json)  # 递归调用处理 next_app_id
+
     # 解析 JSON 字符串
     username = shell_json["username"]
     app_id = shell_json["app_id"]
@@ -147,6 +160,10 @@ def execute_shell_command(shell_json):
 
     thread = Thread(target=run_command)
     thread.start()
+
+    # 创建一个计时器，规定超时时间为10分钟
+    timeout_timer = threading.Timer(600, timeout_handler)  # 10 minutes = 600 seconds
+    timeout_timer.start()
 
     data = {
         "code": 200,
